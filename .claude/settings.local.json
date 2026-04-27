@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Get-ChildItem -Path \"c:\\\\Users\\\\simba\\\\Documents\\\\kali-mcp-nextjs-main\" | Where-Object { $_.PSIsContainer } | Select-Object Name | Sort-Object Name)",
+      "PowerShell(Get-ChildItem -Path \"c:\\\\Users\\\\simba\\\\Documents\\\\kali-mcp-nextjs-main\\\\app\" | Where-Object { $_.PSIsContainer } | Select-Object Name | Sort-Object Name)",
+      "PowerShell(Get-ChildItem -Path \"c:\\\\Users\\\\simba\\\\Documents\\\\kali-mcp-nextjs-main\\\\components\" | Where-Object { $_.PSIsContainer } | Select-Object Name | Sort-Object Name)",
+      "PowerShell(New-Item -ItemType Directory -Path \"c:\\\\Users\\\\simba\\\\Documents\\\\kali-mcp-nextjs-main\\\\components\\\\kali\" -Force)",
+      "PowerShell(New-Item -ItemType Directory -Path \"c:\\\\Users\\\\simba\\\\Documents\\\\kali-mcp-nextjs-main\\\\app\\\\login\" -Force)",
+      "PowerShell(New-Item -ItemType Directory -Path \"c:\\\\Users\\\\simba\\\\Documents\\\\kali-mcp-nextjs-main\\\\app\\\\dashboard\" -Force)",
+      "PowerShell(cd \"c:\\\\Users\\\\simba\\\\Documents\\\\kali-mcp-nextjs-main\"; $env:PATH += \";$env:APPDATA\\\\npm\"; & node_modules\\\\.bin\\\\tsc --noEmit 2>&1 | Select-Object -First 50)"
+    ]
+  }
+}

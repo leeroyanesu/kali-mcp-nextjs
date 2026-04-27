@@ -1,0 +1,59 @@
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import { ThemeProvider } from "@/components/theme-provider";
+import { TooltipProvider } from "@/components/ui/tooltip";
+
+import "./globals.css";
+
+export const metadata: Metadata = {
+  title: "Kali AI",
+  description: "Kali Pentest AI Assistant powered by Gemma 4 via OpenRouter.",
+};
+
+export const viewport = {
+  maximumScale: 1,
+};
+
+const geist = Geist({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-geist",
+});
+
+const geistMono = Geist_Mono({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-geist-mono",
+});
+
+import { ThemeColorHandler } from "@/components/theme-color-handler";
+
+const LIGHT_THEME_COLOR = "hsl(0 0% 100%)";
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html
+      className={`${geist.variable} ${geistMono.variable} dark`}
+      lang="en"
+      suppressHydrationWarning
+    >
+      <head>
+        <meta name="theme-color" content="#060810" />
+      </head>
+      <body className="antialiased" suppressHydrationWarning>
+        <ThemeProvider
+          attribute="class"
+          forcedTheme="dark"
+          disableTransitionOnChange
+        >
+          <ThemeColorHandler />
+          <TooltipProvider>{children}</TooltipProvider>
+        </ThemeProvider>
+      </body>
+    </html>
+  );
+}

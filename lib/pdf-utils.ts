@@ -1,0 +1,31 @@
+export async function exportToPDF(content: string, title: string) {
+  if (typeof window === "undefined") return;
+
+  try {
+    const response = await fetch('/api/pdf', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ content, title }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to generate PDF');
+    }
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${title.replace(/[^\w\s]/gi, '').replace(/\s+/g, "_")}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  } catch (error) {
+    console.error("Failed to generate PDF", error);
+    throw error;
+  }
+}
+
