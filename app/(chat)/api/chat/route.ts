@@ -14,7 +14,7 @@ import {
   DEFAULT_CHAT_MODEL,
   getCapabilities,
 } from "@/lib/ai/models";
-import { type RequestHints, systemPrompt } from "@/lib/ai/prompts";
+import { type RequestHints, systemPrompt, pentestPhasePrompt } from "@/lib/ai/prompts";
 import { getLanguageModel } from "@/lib/ai/providers";
 import { createDocument } from "@/lib/ai/tools/create-document";
 import { editDocument } from "@/lib/ai/tools/edit-document";
@@ -39,7 +39,7 @@ import { convertToUIMessages, generateUUID } from "@/lib/utils";
 import { generateTitleFromUserMessage } from "../../actions";
 import { type PostRequestBody, postRequestBodySchema } from "./schema";
 
-export const maxDuration = 60;
+export const maxDuration = 2700;
 
 // Hardcoded local admin session — no auth required
 const LOCAL_SESSION = {
@@ -193,9 +193,9 @@ export async function POST(request: Request) {
       execute: async ({ writer: dataStream }) => {
         const result = streamText({
           model: getLanguageModel(chatModel),
-          system: systemPrompt({ requestHints, supportsTools }),
+          system: id.startsWith("pentest-") ? pentestPhasePrompt : systemPrompt({ requestHints, supportsTools }),
           messages: modelMessages,
-          stopWhen: stepCountIs(5),
+          stopWhen: stepCountIs(id.startsWith("pentest-") ? 10 : 5),
           experimental_activeTools: isReasoningModel
             ? []
             : ([
@@ -308,7 +308,7 @@ export async function POST(request: Request) {
           const streamContext = getStreamContext();
           if (streamContext) {
             const streamId = generateId();
-            await createStreamId({ streamId, chatId: id });
+            await createStreamId();
             await streamContext.createNewResumableStream(
               streamId,
               () => sseStream

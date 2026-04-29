@@ -12,7 +12,7 @@ export async function GET(request: Request) {
     ).toResponse();
   }
 
-  const suggestions = await getSuggestionsByDocumentId({ documentId });
+  const suggestions = await getSuggestionsByDocumentId();
 
   const [suggestion] = suggestions;
 
