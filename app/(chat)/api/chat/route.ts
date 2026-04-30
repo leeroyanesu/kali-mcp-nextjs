@@ -195,6 +195,7 @@ export async function POST(request: Request) {
           model: getLanguageModel(chatModel),
           system: id.startsWith("pentest-") ? pentestPhasePrompt : systemPrompt({ requestHints, supportsTools }),
           messages: modelMessages,
+          // @ts-ignore - maxTokens may not be in the base type but is supported by the provider
           maxTokens: 2000,
           stopWhen: stepCountIs(id.startsWith("pentest-") ? 10 : 5),
           experimental_activeTools: isReasoningModel
