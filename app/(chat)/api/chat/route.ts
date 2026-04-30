@@ -195,6 +195,7 @@ export async function POST(request: Request) {
           model: getLanguageModel(chatModel),
           system: id.startsWith("pentest-") ? pentestPhasePrompt : systemPrompt({ requestHints, supportsTools }),
           messages: modelMessages,
+          maxTokens: 2000,
           stopWhen: stepCountIs(id.startsWith("pentest-") ? 10 : 5),
           experimental_activeTools: isReasoningModel
             ? []
