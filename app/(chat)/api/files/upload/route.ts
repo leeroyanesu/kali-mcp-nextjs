@@ -1,4 +1,3 @@
-import { put } from "@vercel/blob";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -14,45 +13,5 @@ const FileSchema = z.object({
 });
 
 export async function POST(request: Request) {
-  if (request.body === null) {
-    return new Response("Request body is empty", { status: 400 });
-  }
-
-  try {
-    const formData = await request.formData();
-    const file = formData.get("file") as Blob;
-
-    if (!file) {
-      return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
-    }
-
-    const validatedFile = FileSchema.safeParse({ file });
-
-    if (!validatedFile.success) {
-      const errorMessage = validatedFile.error.errors
-        .map((error) => error.message)
-        .join(", ");
-
-      return NextResponse.json({ error: errorMessage }, { status: 400 });
-    }
-
-    const filename = (formData.get("file") as File).name;
-    const safeName = filename.replace(/[^a-zA-Z0-9._-]/g, "_");
-    const fileBuffer = await file.arrayBuffer();
-
-    try {
-      const data = await put(`${safeName}`, fileBuffer, {
-        access: "public",
-      });
-
-      return NextResponse.json(data);
-    } catch (_error) {
-      return NextResponse.json({ error: "Upload failed" }, { status: 500 });
-    }
-  } catch (_error) {
-    return NextResponse.json(
-      { error: "Failed to process request" },
-      { status: 500 }
-    );
-  }
+  return NextResponse.json({ error: "File upload is currently disabled (Vercel dependencies removed)." }, { status: 501 });
 }

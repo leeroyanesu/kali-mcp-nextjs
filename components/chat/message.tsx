@@ -306,7 +306,7 @@ const PurePreviewMessage = ({
     }
 
     if (type.startsWith("tool-")) {
-      const { toolCallId, state } = part;
+      const { toolCallId, state } = part as any;
 
       return (
         <Tool
@@ -316,20 +316,20 @@ const PurePreviewMessage = ({
         >
           <ToolHeader state={state} type={type as any} />
           <ToolContent>
-            {state === "input-available" && <ToolInput input={part.input} />}
+            {state === "input-available" && <ToolInput input={(part as any).input} />}
             {state === "output-available" && (
               <ToolOutput
                 errorText={undefined}
                 output={
-                  part.output && typeof part.output === "object" && "error" in part.output ? (
+                  (part as any).output && typeof (part as any).output === "object" && "error" in (part as any).output ? (
                     <div className="rounded border p-2 text-red-500">
-                      Error: {String(part.output.error)}
+                      Error: {String((part as any).output.error)}
                     </div>
                   ) : (
                     <div className="max-h-[400px] overflow-auto rounded bg-muted/30 p-2 text-[12px] font-mono whitespace-pre-wrap leading-tight">
-                      {typeof part.output === "string" 
-                        ? part.output 
-                        : JSON.stringify(part.output, null, 2)}
+                      {typeof (part as any).output === "string" 
+                        ? (part as any).output 
+                        : JSON.stringify((part as any).output, null, 2)}
                     </div>
                   )
                 }

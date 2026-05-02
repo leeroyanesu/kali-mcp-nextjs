@@ -1,6 +1,7 @@
 import "server-only";
 
 import type { VisibilityType } from "@/components/chat/visibility-selector";
+import type { ArtifactKind } from "@/components/chat/artifact";
 import { ChatbotError } from "../errors";
 import { 
   localSaveChat, 

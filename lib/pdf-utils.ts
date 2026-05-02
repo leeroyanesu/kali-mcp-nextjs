@@ -1,4 +1,4 @@
-export async function exportToPDF(content: string, title: string) {
+export async function exportToPDF(content: string, title: string, isHtml = false) {
   if (typeof window === "undefined") return;
 
   try {
@@ -7,7 +7,7 @@ export async function exportToPDF(content: string, title: string) {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ content, title }),
+      body: JSON.stringify({ content, title, isHtml }),
     });
 
     if (!response.ok) {

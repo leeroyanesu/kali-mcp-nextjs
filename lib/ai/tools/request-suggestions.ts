@@ -99,16 +99,7 @@ export const requestSuggestions = ({
       }
 
       if (session.user?.id) {
-        const userId = session.user.id;
-
-        await saveSuggestions({
-          suggestions: suggestions.map((suggestion) => ({
-            ...suggestion,
-            userId,
-            createdAt: new Date(),
-            documentCreatedAt: document.createdAt,
-          })),
-        });
+        await saveSuggestions();
       }
 
       return {

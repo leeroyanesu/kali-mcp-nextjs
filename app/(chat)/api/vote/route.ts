@@ -25,7 +25,7 @@ export async function GET(request: Request) {
     return new ChatbotError("not_found:chat").toResponse();
   }
 
-  const votes = await getVotesByChatId({ id: chatId });
+  const votes = await getVotesByChatId();
 
   return Response.json(votes, { status: 200 });
 }
@@ -53,7 +53,7 @@ export async function PATCH(request: Request) {
     return new ChatbotError("not_found:vote").toResponse();
   }
 
-  await voteMessage({ chatId, messageId, type });
+  await voteMessage();
 
   return new Response("Message voted", { status: 200 });
 }

@@ -30,6 +30,7 @@ import {
 import { getSessions } from "@/lib/pentest/session-store";
 import type { PentestSession } from "@/lib/pentest/types";
 import { PHASE_LABELS } from "@/lib/pentest/types";
+import { checkMcpStatus } from "./actions";
 import { cn } from "@/lib/utils";
 
 /* ── Simulated system stats ───────────────────────────────────── */
@@ -56,33 +57,24 @@ function useStats() {
 
 /* ── Kali tool definitions ────────────────────────────────────── */
 const TOOLS = [
-  { id: "nmap", name: "Nmap", desc: "Network scanner", icon: NetworkIcon, color: "#367BF0", category: "Network" },
-  { id: "sqlmap", name: "SQLMap", desc: "SQL injection", icon: DatabaseIcon, color: "#f97316", category: "Web" },
-  { id: "wpscan", name: "WPScan", desc: "WordPress audit", icon: GlobeIcon, color: "#a855f7", category: "Web" },
-  { id: "ffuf", name: "ffuf", desc: "Web fuzzer", icon: SearchIcon, color: "#22c55e", category: "Web" },
-  { id: "medusa", name: "Medusa", desc: "Brute force", icon: KeyIcon, color: "#ef4444", category: "Password" },
-  { id: "hydra", name: "Hydra", desc: "Login cracker", icon: ZapIcon, color: "#eab308", category: "Password" },
-  { id: "metasploit", name: "Metasploit", desc: "Exploit framework", icon: BugIcon, color: "#ec4899", category: "Exploit" },
-  { id: "wireshark", name: "Wireshark", desc: "Packet analysis", icon: RadioIcon, color: "#06b6d4", category: "Network" },
-  { id: "gobuster", name: "Gobuster", desc: "Dir/DNS brute", icon: FileSearchIcon, color: "#84cc16", category: "Web" },
-  { id: "aircrack", name: "Aircrack-ng", desc: "WiFi auditing", icon: WifiIcon, color: "#f59e0b", category: "Wireless" },
-  { id: "autopsy", name: "Autopsy", desc: "Digital forensics", icon: HardDriveIcon, color: "#8b5cf6", category: "Forensics" },
-  { id: "pentest", name: "Auto-Pentest", desc: "AI pentest agent", icon: ShieldIcon, color: "#367BF0", category: "AI" },
+  { id: "nmap", name: "Nmap", desc: "Network scanning and service detection", icon: NetworkIcon, color: "#367BF0", category: "Network" },
+  { id: "sqlmap", name: "SQLMap", desc: "SQL injection testing and exploitation", icon: DatabaseIcon, color: "#f97316", category: "Web" },
+  { id: "nikto", name: "Nikto", desc: "Web server vulnerability scanning", icon: ShieldAlertIcon, color: "#ef4444", category: "Web" },
+  { id: "gobuster", name: "Gobuster", desc: "Directory and file brute-forcing", icon: FileSearchIcon, color: "#84cc16", category: "Web" },
+  { id: "dirb", name: "Dirb", desc: "Web content scanner", icon: SearchIcon, color: "#eab308", category: "Web" },
+  { id: "wpscan", name: "WPScan", desc: "WordPress security scanner", icon: GlobeIcon, color: "#a855f7", category: "Web" },
+  { id: "ffuf", name: "ffuf", desc: "Fast web fuzzer for directories/vhosts/parameters", icon: ZapIcon, color: "#22c55e", category: "Web" },
+  { id: "metasploit", name: "Metasploit", desc: "Exploitation framework integration", icon: BugIcon, color: "#ec4899", category: "Exploit" },
+  { id: "hydra", name: "Hydra", desc: "Network login cracker", icon: ActivityIcon, color: "#06b6d4", category: "Password" },
+  { id: "medusa", name: "Medusa", desc: "Parallel password cracker", icon: KeyIcon, color: "#ef4444", category: "Password" },
+  { id: "john", name: "John the Ripper", desc: "Password hash cracker", icon: KeyIcon, color: "#f59e0b", category: "Password" },
+  { id: "enum4linux", name: "Enum4linux", desc: "SMB/Windows enumeration", icon: ServerIcon, color: "#8b5cf6", category: "Network" },
 ];
 
-const CATEGORIES = ["All", "Network", "Web", "Password", "Exploit", "Wireless", "Forensics", "AI"];
+const CATEGORIES = ["All", "Network", "Web", "Password", "Exploit"];
 
 /* ── Mock activity log ────────────────────────────────────────── */
-const INITIAL_LOGS = [
-  { time: "13:42:11", msg: "nmap scan completed — 192.168.1.0/24", level: "ok" },
-  { time: "13:39:05", msg: "sqlmap: 2 injection points found on /login", level: "warn" },
-  { time: "13:31:58", msg: "ffuf: 47 valid paths discovered", level: "ok" },
-  { time: "13:28:34", msg: "wpscan: 3 vulnerable plugins detected", level: "warn" },
-  { time: "13:15:22", msg: "SSH brute force attempt blocked — 10.0.0.5", level: "error" },
-  { time: "13:02:09", msg: "Pentest session #A4F2 initiated", level: "info" },
-  { time: "12:58:44", msg: "Autopsy: forensic image mounted successfully", level: "ok" },
-  { time: "12:44:17", msg: "Metasploit: CVE-2023-0386 payload staged", level: "warn" },
-];
+const INITIAL_LOGS: Array<{ time: string; msg: string; level: string }> = [];
 
 /* ── Stat bar ─────────────────────────────────────────────────── */
 function StatBar({ value, color = "#367BF0" }: { value: number; color?: string }) {
@@ -118,19 +110,15 @@ export default function DashboardPage() {
   }, []);
 
   // Randomly push fake log entries
+  const [mcpConnected, setMcpConnected] = useState(false);
+
   useEffect(() => {
-    const NEW_EVENTS = [
-      { msg: "Port scan — 10.0.0.100:22 open", level: "info" },
-      { msg: "HTTP 200 on /admin — credentials valid", level: "warn" },
-      { msg: "Reverse shell established — 10.10.14.3:4444", level: "ok" },
-      { msg: "DNS lookup: target.local resolved", level: "info" },
-      { msg: "Privilege escalation attempt detected", level: "error" },
-    ];
-    const id = setInterval(() => {
-      const evt = NEW_EVENTS[Math.floor(Math.random() * NEW_EVENTS.length)];
-      const t = new Date().toLocaleTimeString("en-US", { hour12: false });
-      setLogs((prev) => [{ time: t, msg: evt.msg, level: evt.level }, ...prev.slice(0, 14)]);
-    }, 6000);
+    async function pingMcp() {
+      const status = await checkMcpStatus();
+      setMcpConnected(status.connected);
+    }
+    pingMcp();
+    const id = setInterval(pingMcp, 5000);
     return () => clearInterval(id);
   }, []);
 
@@ -177,13 +165,13 @@ export default function DashboardPage() {
               <LayoutDashboardIcon className="size-3.5" />
               <span className="hidden sm:inline">Dashboard</span>
             </Link>
-            <Link
+            {/* <Link
               className="flex items-center gap-1.5 rounded px-2.5 py-1.5 text-gray-500 transition-colors hover:bg-white/5 hover:text-gray-300"
               href="/"
             >
               <TerminalIcon className="size-3.5" />
               <span className="hidden sm:inline">AI Terminal</span>
-            </Link>
+            </Link> */}
             <Link
               className="flex items-center gap-1.5 rounded px-2.5 py-1.5 text-gray-500 transition-colors hover:bg-red-500/10 hover:text-red-400"
               href="/pentest"
@@ -308,13 +296,13 @@ export default function DashboardPage() {
                 <ZapIcon className="size-4" />
                 <span className="tracking-wider uppercase text-xs">Kali Toolbox</span>
               </div>
-              <Link
+              {/* <Link
                 className="flex items-center gap-1 text-[10px] text-gray-600 transition-colors hover:text-[#367BF0]"
                 href="/"
               >
                 Open Terminal
                 <ChevronRightIcon className="size-3" />
-              </Link>
+              </Link> */}
             </div>
 
             {/* Category filter */}
@@ -457,7 +445,7 @@ export default function DashboardPage() {
             root@kali-ai <span className="text-gray-800">|</span> Kali AI Terminal v2.0.0
           </span>
           <div className="flex items-center gap-4">
-            <span>MCP: <span className="text-[#22c55e]">CONNECTED</span></span>
+            <span>MCP: <span className={mcpConnected ? "text-[#22c55e]" : "text-red-500"}>{mcpConnected ? "CONNECTED" : "OFFLINE"}</span></span>
             <span>AI: <span className="text-[#22c55e]">READY</span></span>
             <span className="tabular-nums text-[#367BF0]/50">{time}</span>
           </div>

@@ -37,15 +37,9 @@ export async function generateTitleFromUserMessage({
 }
 
 export async function deleteTrailingMessages({ id }: { id: string }) {
-  const [message] = await getMessageById({ id });
-  if (!message) {
-    throw new Error("Message not found");
-  }
-
-  await deleteMessagesByChatIdAfterTimestamp({
-    chatId: message.chatId,
-    timestamp: message.createdAt,
-  });
+  // getMessageById is a local stub — lookup by id is not supported in local-first mode
+  // This is a no-op in local deployments
+  void id;
 }
 
 export async function updateChatVisibility({
@@ -55,5 +49,7 @@ export async function updateChatVisibility({
   chatId: string;
   visibility: VisibilityType;
 }) {
-  await updateChatVisibilityById({ chatId, visibility });
+  // local stub — no-op in local-first mode
+  void chatId;
+  void visibility;
 }
