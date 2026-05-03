@@ -14,13 +14,13 @@ Kali AI is a specialized AI-powered pentesting assistant designed for security p
 - **Privacy Centric**: Fully decoupled from external authentication providers (Vercel/NextAuth). Operates as a local-first application.
 - **Advanced UI**: 
   - **Artifact Panel**: Side-by-side view for security reports, scan results, and code.
-  - **Dark Mode**: Sleek, security-focused aesthetic with glassmorphism effects.
+  - **Theme Support**: Sleek, security-focused aesthetics with support for both **Light and Dark modes**.
   - **Adaptive Header**: Hydration-safe UI with a dynamic layout.
 
 ## 🛠 Technology Stack
 
-- **Framework**: [Next.js 15+](https://nextjs.org) (App Router)
-- **AI Integration**: [AI SDK](https://ai-sdk.dev) using **Claude 4.6 Sonnet** (via Anthropic).
+- **Framework**: [Next.js 16+](https://nextjs.org) (App Router)
+- **AI Integration**: [AI SDK](https://ai-sdk.dev) using **Claude 3.5 Sonnet** (via Anthropic).
 - **Styling**: Tailwind CSS & Lucide Icons.
 - **Storage**: Dexie.js (Client) + Local JSON FS (Server).
 - **PDF Engine**: Puppeteer.
@@ -29,14 +29,13 @@ Kali AI is a specialized AI-powered pentesting assistant designed for security p
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 20+
 - [Kali MCP Server](https://github.com/leeroyanesu/kali-mcp-server) running locally.
 
 ### Installation
 
-1. **Clone the repository**:
+1. **Navigate to the project directory**:
    ```bash
-   git clone https://github.com/leeroyanesu/kali-mcp-nextjs.git
    cd kali-mcp-nextjs
    ```
 

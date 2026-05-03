@@ -26,7 +26,10 @@ import {
   WifiIcon,
   ZapIcon,
   CircleIcon,
+  SunIcon,
+  MoonIcon,
 } from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { getSessions } from "@/lib/pentest/session-store";
 import type { PentestSession } from "@/lib/pentest/types";
 import { PHASE_LABELS } from "@/lib/pentest/types";
@@ -79,7 +82,7 @@ const INITIAL_LOGS: Array<{ time: string; msg: string; level: string }> = [];
 /* ── Stat bar ─────────────────────────────────────────────────── */
 function StatBar({ value, color = "#367BF0" }: { value: number; color?: string }) {
   return (
-    <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-white/5">
+    <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-primary/5 dark:bg-white/5">
       <motion.div
         animate={{ width: `${value}%` }}
         className="h-full rounded-full"
@@ -128,30 +131,30 @@ export default function DashboardPage() {
       : TOOLS.filter((t) => t.category === activeCategory);
 
   const levelColor: Record<string, string> = {
-    ok: "text-[#22c55e]",
-    warn: "text-[#f59e0b]",
-    error: "text-[#ef4444]",
-    info: "text-[#367BF0]",
+    ok: "text-green-500",
+    warn: "text-yellow-500",
+    error: "text-red-500",
+    info: "text-primary",
   };
 
   const levelDot: Record<string, string> = {
-    ok: "bg-[#22c55e]",
-    warn: "bg-[#f59e0b]",
-    error: "bg-[#ef4444]",
-    info: "bg-[#367BF0]",
+    ok: "bg-green-500",
+    warn: "bg-yellow-500",
+    error: "bg-red-500",
+    info: "bg-primary",
   };
 
   return (
-    <div className="min-h-dvh bg-[#060810] font-mono text-gray-200">
+    <div className="min-h-dvh bg-background font-mono text-foreground transition-colors duration-300">
       {/* ── Top nav ── */}
-      <header className="sticky top-0 z-50 border-b border-[#367BF0]/20 bg-[#060810]/95 backdrop-blur-md">
+      <header className="sticky top-0 z-50 border-b border-primary/20 bg-background/95 backdrop-blur-md">
         <div className="mx-auto flex max-w-screen-xl items-center gap-4 px-4 py-3">
           {/* Logo */}
           <Link className="flex items-center gap-2.5 mr-2" href="/dashboard">
-            <div className="flex size-7 items-center justify-center rounded border border-[#367BF0]/40 bg-[#367BF0]/10">
-              <ShieldIcon className="size-4 text-[#367BF0]" />
+            <div className="flex size-7 items-center justify-center rounded border border-primary/40 bg-primary/10">
+              <ShieldIcon className="size-4 text-primary" />
             </div>
-            <span className="text-sm font-semibold tracking-widest text-[#367BF0] uppercase hidden sm:block">
+            <span className="text-sm font-semibold tracking-widest text-primary uppercase hidden sm:block">
               Kali AI
             </span>
           </Link>
@@ -159,7 +162,7 @@ export default function DashboardPage() {
           {/* Nav links */}
           <nav className="flex items-center gap-1 text-xs">
             <Link
-              className="flex items-center gap-1.5 rounded px-2.5 py-1.5 text-[#367BF0] bg-[#367BF0]/10 border border-[#367BF0]/25"
+              className="flex items-center gap-1.5 rounded px-2.5 py-1.5 text-primary bg-primary/10 border border-primary/25"
               href="/dashboard"
             >
               <LayoutDashboardIcon className="size-3.5" />
@@ -182,14 +185,15 @@ export default function DashboardPage() {
           </nav>
 
           {/* Right side */}
-          <div className="ml-auto flex items-center gap-4 text-xs text-gray-600">
+          <div className="ml-auto flex items-center gap-4 text-xs text-muted-foreground">
+            <ThemeToggle />
             <div className="hidden sm:flex items-center gap-1.5">
-              <CircleIcon className="size-1.5 fill-[#22c55e] text-[#22c55e] animate-pulse" />
-              <span className="text-[#22c55e]">ONLINE</span>
+              <CircleIcon className="size-1.5 fill-green-500 text-green-500 animate-pulse" />
+              <span className="text-green-500">ONLINE</span>
             </div>
-            <span className="tabular-nums text-[#367BF0]/60">{time}</span>
+            <span className="tabular-nums text-primary/60">{time}</span>
             <button
-              className="flex items-center gap-1.5 text-gray-600 transition-colors hover:text-gray-300"
+              className="flex items-center gap-1.5 text-muted-foreground transition-colors hover:text-foreground"
               onClick={() => {
                 document.cookie = "kali-auth=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
                 document.cookie = "kali-username=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
@@ -212,75 +216,75 @@ export default function DashboardPage() {
           transition={{ duration: 0.4 }}
         >
           {/* CPU */}
-          <div className="rounded border border-[#367BF0]/20 bg-[#0a0f1e] p-4">
+          <div className="rounded border border-primary/20 bg-card p-4 transition-all hover:border-primary/40">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-xs text-gray-500">
-                <CpuIcon className="size-3.5 text-[#367BF0]" />
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <CpuIcon className="size-3.5 text-primary" />
                 CPU
               </div>
               <span
                 className={cn(
                   "text-lg font-bold tabular-nums",
-                  cpu > 80 ? "text-[#ef4444]" : cpu > 60 ? "text-[#f59e0b]" : "text-[#22c55e]"
+                  cpu > 80 ? "text-red-500" : cpu > 60 ? "text-yellow-500" : "text-green-500"
                 )}
               >
                 {Math.round(cpu)}%
               </span>
             </div>
-            <StatBar color={cpu > 80 ? "#ef4444" : cpu > 60 ? "#f59e0b" : "#22c55e"} value={cpu} />
+            <StatBar color={cpu > 80 ? "var(--kali-red)" : cpu > 60 ? "var(--kali-yellow)" : "var(--kali-green)"} value={cpu} />
           </div>
 
           {/* RAM */}
-          <div className="rounded border border-[#367BF0]/20 bg-[#0a0f1e] p-4">
+          <div className="rounded border border-primary/20 bg-card p-4 transition-all hover:border-primary/40">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-xs text-gray-500">
-                <ServerIcon className="size-3.5 text-[#367BF0]" />
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <ServerIcon className="size-3.5 text-primary" />
                 RAM
               </div>
               <span
                 className={cn(
                   "text-lg font-bold tabular-nums",
-                  ram > 85 ? "text-[#ef4444]" : ram > 65 ? "text-[#f59e0b]" : "text-[#22c55e]"
+                  ram > 85 ? "text-red-500" : ram > 65 ? "text-yellow-500" : "text-green-500"
                 )}
               >
                 {Math.round(ram)}%
               </span>
             </div>
-            <StatBar color={ram > 85 ? "#ef4444" : ram > 65 ? "#f59e0b" : "#22c55e"} value={ram} />
+            <StatBar color={ram > 85 ? "var(--kali-red)" : ram > 65 ? "var(--kali-yellow)" : "var(--kali-green)"} value={ram} />
           </div>
 
           {/* Network */}
-          <div className="rounded border border-[#367BF0]/20 bg-[#0a0f1e] p-4">
-            <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
-              <ActivityIcon className="size-3.5 text-[#367BF0]" />
+          <div className="rounded border border-primary/20 bg-card p-4 transition-all hover:border-primary/40">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+              <ActivityIcon className="size-3.5 text-primary" />
               Network
             </div>
             <div className="space-y-0.5 text-xs tabular-nums">
               <div className="flex justify-between">
-                <span className="text-gray-600">↑</span>
-                <span className="text-[#22c55e]">{netUp.toFixed(1)} MB/s</span>
+                <span className="text-muted-foreground/60">↑</span>
+                <span className="text-green-500">{netUp.toFixed(1)} MB/s</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">↓</span>
-                <span className="text-[#367BF0]">{netDn.toFixed(1)} MB/s</span>
+                <span className="text-muted-foreground/60">↓</span>
+                <span className="text-primary">{netDn.toFixed(1)} MB/s</span>
               </div>
             </div>
           </div>
 
           {/* Disk + Sessions */}
-          <div className="rounded border border-[#367BF0]/20 bg-[#0a0f1e] p-4">
+          <div className="rounded border border-primary/20 bg-card p-4 transition-all hover:border-primary/40">
             <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2 text-xs text-gray-500">
-                <HardDriveIcon className="size-3.5 text-[#367BF0]" />
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <HardDriveIcon className="size-3.5 text-primary" />
                 Disk
               </div>
-              <span className="text-sm font-bold text-gray-300 tabular-nums">{disk}%</span>
+              <span className="text-sm font-bold text-foreground/70 tabular-nums">{disk}%</span>
             </div>
-            <StatBar color="#367BF0" value={disk} />
+            <StatBar color="var(--primary)" value={disk} />
             <div className="mt-3 flex items-center gap-1.5 text-xs">
-              <ShieldIcon className="size-3 text-[#22c55e]" />
-              <span className="text-gray-600">Sessions:</span>
-              <span className="text-[#22c55e] font-bold">{sessions}</span>
+              <ShieldIcon className="size-3 text-green-500" />
+              <span className="text-muted-foreground">Sessions:</span>
+              <span className="text-green-500 font-bold">{sessions}</span>
             </div>
           </div>
         </motion.div>
@@ -290,13 +294,13 @@ export default function DashboardPage() {
           {/* ── Tools panel ── */}
           <motion.div
             animate={{ opacity: 1, y: 0 }}
-            className="rounded border border-[#367BF0]/20 bg-[#0a0f1e]"
+            className="rounded border border-primary/20 bg-card"
             initial={{ opacity: 0, y: 8 }}
             transition={{ delay: 0.1, duration: 0.4 }}
           >
             {/* Panel header */}
-            <div className="flex items-center justify-between border-b border-[#367BF0]/15 px-4 py-3">
-              <div className="flex items-center gap-2 text-sm text-[#367BF0]">
+            <div className="flex items-center justify-between border-b border-primary/15 px-4 py-3">
+              <div className="flex items-center gap-2 text-sm text-primary">
                 <ZapIcon className="size-4" />
                 <span className="tracking-wider uppercase text-xs">Kali Toolbox</span>
               </div>
@@ -310,15 +314,15 @@ export default function DashboardPage() {
             </div>
 
             {/* Category filter */}
-            <div className="flex gap-1 overflow-x-auto border-b border-[#367BF0]/10 px-4 py-2 no-scrollbar">
+            <div className="flex gap-1 overflow-x-auto border-b border-primary/10 px-4 py-2 no-scrollbar">
               {CATEGORIES.map((cat) => (
                 <button
                   key={cat}
                   className={cn(
                     "shrink-0 rounded px-2.5 py-1 text-[11px] tracking-wide uppercase transition-all",
                     activeCategory === cat
-                      ? "bg-[#367BF0]/20 text-[#367BF0] border border-[#367BF0]/35"
-                      : "text-gray-600 hover:text-gray-400 hover:bg-white/5"
+                      ? "bg-primary/20 text-primary border border-primary/35"
+                      : "text-muted-foreground hover:text-foreground hover:bg-primary/5"
                   )}
                   onClick={() => setActiveCategory(cat)}
                 >
@@ -339,15 +343,15 @@ export default function DashboardPage() {
                     transition={{ delay: i * 0.04, duration: 0.25 }}
                   >
                     <Link
-                      className="group flex flex-col gap-2 rounded border border-white/5 bg-white/[0.02] p-3 transition-all hover:border-[#367BF0]/30 hover:bg-[#367BF0]/5 hover:shadow-[0_0_12px_rgba(54,123,240,0.1)]"
+                      className="group flex flex-col gap-2 rounded border border-primary/5 bg-primary/[0.02] p-3 transition-all hover:border-primary/30 hover:bg-primary/5 hover:shadow-[0_0_12px_rgba(var(--primary-rgb),0.1)]"
                       href={`/?tool=${tool.id}`}
                     >
                       <Icon className="size-5 transition-colors" style={{ color: tool.color }} />
                       <div>
-                        <div className="text-xs font-semibold text-gray-200 group-hover:text-white">
+                        <div className="text-xs font-semibold text-foreground/90 group-hover:text-foreground">
                           {tool.name}
                         </div>
-                        <div className="text-[10px] text-gray-600 leading-tight">{tool.desc}</div>
+                        <div className="text-[10px] text-muted-foreground/60 leading-tight">{tool.desc}</div>
                       </div>
                     </Link>
                   </motion.div>
@@ -361,16 +365,16 @@ export default function DashboardPage() {
             {/* Pentest Engagements */}
             <motion.div
               animate={{ opacity: 1, y: 0 }}
-              className="rounded border border-[#367BF0]/20 bg-[#0a0f1e]"
+              className="rounded border border-primary/20 bg-card"
               initial={{ opacity: 0, y: 8 }}
               transition={{ delay: 0.15, duration: 0.4 }}
             >
-              <div className="flex items-center gap-2 border-b border-[#367BF0]/15 px-4 py-3 text-xs text-[#367BF0]">
+              <div className="flex items-center gap-2 border-b border-primary/15 px-4 py-3 text-xs text-primary">
                 <ShieldAlertIcon className="size-3.5" />
-                <span className="tracking-wider uppercase">Pentest Engagements</span>
+                <span className="tracking-wider uppercase">Pentest</span>
                 <Link
                   href="/pentest"
-                  className="ml-auto flex items-center gap-1 text-[10px] text-gray-600 hover:text-[#367BF0] transition-colors"
+                  className="ml-auto flex items-center gap-1 text-[10px] text-muted-foreground hover:text-primary transition-colors"
                 >
                   <PlusIcon className="size-3" />
                   New
@@ -378,25 +382,25 @@ export default function DashboardPage() {
               </div>
               {pentestSessions.length === 0 ? (
                 <div className="px-4 py-6 text-center">
-                  <p className="text-[11px] text-gray-700 mb-2">No engagements yet</p>
+                  <p className="text-[11px] text-muted-foreground/60 mb-2">No engagements yet</p>
                   <Link
                     href="/pentest"
-                    className="text-[11px] text-[#367BF0]/60 hover:text-[#367BF0] transition-colors"
+                    className="text-[11px] text-primary/60 hover:text-primary transition-colors"
                   >
                     Start a pentest →
                   </Link>
                 </div>
               ) : (
-                <div className="divide-y divide-white/5 px-4">
+                <div className="divide-y divide-primary/5 px-4">
                   {pentestSessions.map((sess) => (
                     <div key={sess.id} className="flex items-start justify-between py-3">
                       <div className="space-y-0.5 min-w-0 flex-1 mr-2">
-                        <div className="text-[11px] font-semibold text-gray-300 truncate">{sess.config.name}</div>
-                        <div className="text-[10px] text-gray-600">{sess.config.targetNetwork}</div>
-                        <div className="text-[10px] text-[#367BF0]/70">{PHASE_LABELS[sess.activePhase]}</div>
+                        <div className="text-[11px] font-semibold text-foreground/80 truncate">{sess.config.name}</div>
+                        <div className="text-[10px] text-muted-foreground/60">{sess.config.targetNetwork}</div>
+                        <div className="text-[10px] text-primary/70">{PHASE_LABELS[sess.activePhase]}</div>
                       </div>
                       <Link
-                        className="shrink-0 rounded border border-[#367BF0]/20 px-2 py-1 text-[10px] text-[#367BF0]/60 transition-colors hover:border-[#367BF0]/40 hover:text-[#367BF0]"
+                        className="shrink-0 rounded border border-primary/20 px-2 py-1 text-[10px] text-primary/60 transition-colors hover:border-primary/40 hover:text-primary"
                         href={`/pentest/${sess.id}`}
                       >
                         Resume
@@ -410,14 +414,14 @@ export default function DashboardPage() {
             {/* Activity log */}
             <motion.div
               animate={{ opacity: 1, y: 0 }}
-              className="rounded border border-[#367BF0]/20 bg-[#0a0f1e]"
+              className="rounded border border-primary/20 bg-card"
               initial={{ opacity: 0, y: 8 }}
               transition={{ delay: 0.2, duration: 0.4 }}
             >
-              <div className="flex items-center gap-2 border-b border-[#367BF0]/15 px-4 py-3 text-xs text-[#367BF0]">
+              <div className="flex items-center gap-2 border-b border-primary/15 px-4 py-3 text-xs text-primary">
                 <ActivityIcon className="size-3.5" />
                 <span className="tracking-wider uppercase">Activity Log</span>
-                <span className="ml-auto size-1.5 animate-pulse rounded-full bg-[#22c55e]" />
+                <span className="ml-auto size-1.5 animate-pulse rounded-full bg-green-500" />
               </div>
               <div className="max-h-64 overflow-y-auto px-3 py-2 space-y-0.5">
                 {logs.map((log, i) => (
@@ -434,8 +438,8 @@ export default function DashboardPage() {
                         levelDot[log.level]
                       )}
                     />
-                    <span className="shrink-0 tabular-nums text-gray-700">{log.time}</span>
-                    <span className={cn("min-w-0", levelColor[log.level])}>{log.msg}</span>
+                    <span className="shrink-0 tabular-nums text-muted-foreground/60">{log.time}</span>
+                    <span className={cn("min-w-0 font-medium", levelColor[log.level])}>{log.msg}</span>
                   </motion.div>
                 ))}
               </div>
@@ -444,14 +448,14 @@ export default function DashboardPage() {
         </div>
 
         {/* ── Footer status bar ── */}
-        <div className="flex items-center justify-between border-t border-[#367BF0]/10 pt-3 text-[10px] text-gray-700">
+        <div className="flex items-center justify-between border-t border-primary/10 pt-3 text-[10px] text-muted-foreground/50">
           <span>
-            root@kali-ai <span className="text-gray-800">|</span> Kali AI Terminal v2.0.0
+            root@kali-ai <span className="text-muted-foreground/20">|</span> Kali AI Terminal v2.0.0
           </span>
           <div className="flex items-center gap-4">
-            <span>MCP: <span className={mcpConnected ? "text-[#22c55e]" : "text-red-500"}>{mcpConnected ? "CONNECTED" : "OFFLINE"}</span></span>
-            <span>AI: <span className="text-[#22c55e]">READY</span></span>
-            <span className="tabular-nums text-[#367BF0]/50">{time}</span>
+            <span>MCP: <span className={mcpConnected ? "text-green-500" : "text-red-500"}>{mcpConnected ? "CONNECTED" : "OFFLINE"}</span></span>
+            <span>AI: <span className="text-green-500">READY</span></span>
+            <span className="tabular-nums text-primary/50">{time}</span>
           </div>
         </div>
       </main>
