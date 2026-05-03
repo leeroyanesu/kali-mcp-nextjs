@@ -37,7 +37,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      className={`${geist.variable} ${geistMono.variable} dark`}
+      className={`${geist.variable} ${geistMono.variable}`}
       lang="en"
       suppressHydrationWarning
     >
@@ -47,7 +47,8 @@ export default function RootLayout({
       <body className="antialiased" suppressHydrationWarning>
         <ThemeProvider
           attribute="class"
-          forcedTheme="dark"
+          defaultTheme="system"
+          enableSystem
           disableTransitionOnChange
         >
           <ThemeColorHandler />

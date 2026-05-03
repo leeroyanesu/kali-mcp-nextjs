@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { MatrixRain } from "@/components/kali/matrix-rain";
 import { ShieldIcon, EyeIcon, EyeOffIcon, AlertCircleIcon } from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { db } from "@/lib/db/dexie";
 import { nanoid } from "nanoid";
 import { hash, compare } from "bcrypt-ts";
@@ -144,21 +145,26 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative flex min-h-dvh flex-col items-center justify-center overflow-hidden bg-black font-mono">
+    <div className="relative flex min-h-dvh flex-col items-center justify-center overflow-hidden bg-background font-mono transition-colors duration-300">
       {/* Matrix rain */}
       <MatrixRain
-        className="absolute inset-0 opacity-[0.18]"
-        color="#367BF0"
+        className="absolute inset-0 opacity-[0.12] dark:opacity-[0.18]"
+        color="var(--primary)"
         speed={38}
       />
 
       {/* Radial vignette */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_50%,transparent_40%,rgba(0,0,0,0.8)_100%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_50%,transparent_40%,var(--background)_100%)] opacity-80" />
+
+      {/* Theme Toggle Position */}
+      <div className="absolute right-4 top-4 z-50">
+        <ThemeToggle />
+      </div>
 
       {/* Top scanline */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div
-          className="absolute left-0 right-0 h-[2px] bg-[#367BF0]/20"
+          className="absolute left-0 right-0 h-[2px] bg-primary/20"
           style={{ animation: "scanline 8s linear infinite" }}
         />
       </div>
@@ -171,10 +177,10 @@ export default function LoginPage() {
           initial={{ opacity: 0 }}
           transition={{ duration: 1 }}
         >
-          <pre className="hidden select-none text-center text-[9px] leading-[1.15] text-[#367BF0] sm:block">
+          <pre className="hidden select-none text-center text-[9px] leading-[1.15] text-primary sm:block">
             {ASCII_KALI}
           </pre>
-          <div className="mt-2 text-[10px] tracking-[0.35em] text-[#367BF0]/60 uppercase">
+          <div className="mt-2 text-[10px] tracking-[0.35em] text-primary/60 uppercase">
             Reconnaissance & Exploitation <br /> Cyber Security
           </div>
         </motion.div>
@@ -184,7 +190,7 @@ export default function LoginPage() {
           {!bootDone && (
             <motion.div
               animate={{ opacity: 1 }}
-              className="mb-4 rounded border border-[#367BF0]/20 bg-black/80 p-4 text-xs backdrop-blur-sm"
+              className="mb-4 rounded border border-primary/20 bg-card/80 p-4 text-xs backdrop-blur-sm"
               exit={{ opacity: 0, transition: { duration: 0.3 } }}
               initial={{ opacity: 0 }}
               transition={{ duration: 0.4 }}
@@ -201,11 +207,11 @@ export default function LoginPage() {
                     <span
                       className={
                         line.text.includes("[OK]")
-                          ? "text-[#22c55e]"
+                          ? "text-green-500"
                           : line.text.startsWith("BIOS") ||
                               line.text.startsWith("KALI")
-                            ? "text-[#367BF0]"
-                            : "text-gray-400"
+                            ? "text-primary"
+                            : "text-muted-foreground"
                       }
                     >
                       {line.text}
@@ -214,7 +220,7 @@ export default function LoginPage() {
                 </div>
               ))}
               {visibleLines < BOOT_SEQUENCE.length && (
-                <span className="inline-block h-3 w-2 animate-pulse bg-[#367BF0]" />
+                <span className="inline-block h-3 w-2 animate-pulse bg-primary" />
               )}
             </motion.div>
           )}
@@ -225,47 +231,47 @@ export default function LoginPage() {
           {bootDone && (
             <motion.div
               animate={{ opacity: 1, y: 0 }}
-              className="rounded border border-[#367BF0]/30 bg-black/90 shadow-[0_0_40px_rgba(54,123,240,0.1)] backdrop-blur-md"
+              className="rounded border border-primary/30 bg-card/90 shadow-[0_0_40px_rgba(var(--primary-rgb),0.1)] backdrop-blur-md"
               initial={{ opacity: 0, y: 12 }}
               transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
             >
               {/* Title bar */}
-              <div className="flex items-center gap-2 border-b border-[#367BF0]/20 px-4 py-2.5">
+              <div className="flex items-center gap-2 border-b border-primary/20 px-4 py-2.5">
                 <div className="flex gap-1.5">
                   <div className="size-2.5 rounded-full bg-red-500/80" />
                   <div className="size-2.5 rounded-full bg-yellow-500/80" />
-                  <div className="size-2.5 rounded-full bg-[#22c55e]/80" />
+                  <div className="size-2.5 rounded-full bg-green-500/80" />
                 </div>
-                <span className="mx-auto text-[11px] text-[#367BF0]/60 tracking-widest uppercase">
+                <span className="mx-auto text-[11px] text-primary/60 tracking-widest uppercase">
                   artemis — authentication
                 </span>
-                <ShieldIcon className="size-3.5 text-[#367BF0]/40" />
+                <ShieldIcon className="size-3.5 text-primary/40" />
               </div>
 
               <div className="p-6">
                 {/* Prompt line */}
                 <div className="mb-5 text-xs">
-                  <span className="text-[#367BF0]">root@kali-ai</span>
-                  <span className="text-gray-600">:</span>
-                  <span className="text-[#00cfff]">~</span>
-                  <span className="text-gray-500">$ </span>
-                  <span className="text-gray-300">login --system ai-terminal</span>
-                  <span className="inline-block h-3 w-1.5 translate-y-[1px] animate-pulse bg-[#22c55e] ml-0.5" />
+                  <span className="text-primary font-bold">root@kali-ai</span>
+                  <span className="text-muted-foreground">:</span>
+                  <span className="text-cyan-500">~</span>
+                  <span className="text-muted-foreground">$ </span>
+                  <span className="text-foreground/80">login --system ai-terminal</span>
+                  <span className="inline-block h-3 w-1.5 translate-y-[1px] animate-pulse bg-green-500 ml-0.5" />
                 </div>
 
                 <form className="space-y-4" onSubmit={handleSubmit}>
                   {/* Username */}
                   <div>
-                    <label className="mb-1.5 block text-[11px] text-gray-600 tracking-wider uppercase">
+                    <label className="mb-1.5 block text-[11px] text-muted-foreground tracking-wider uppercase">
                       Username
                     </label>
-                    <div className="flex items-center rounded border border-[#367BF0]/25 bg-[#060810] px-3 py-2.5 transition-all focus-within:border-[#367BF0]/60 focus-within:shadow-[0_0_10px_rgba(54,123,240,0.15)]">
-                      <span className="mr-2 text-[#367BF0] text-sm select-none">›</span>
+                    <div className="flex items-center rounded border border-primary/25 bg-muted/30 px-3 py-2.5 transition-all focus-within:border-primary/60 focus-within:shadow-[0_0_10px_rgba(var(--primary-rgb),0.15)]">
+                      <span className="mr-2 text-primary text-sm select-none">›</span>
                       <input
                         ref={usernameRef}
                         autoComplete="off"
                         autoCorrect="off"
-                        className="flex-1 bg-transparent text-sm text-[#22c55e] outline-none placeholder:text-gray-700"
+                        className="flex-1 bg-transparent text-sm text-green-500 outline-none placeholder:text-muted-foreground/50"
                         placeholder="root"
                         spellCheck={false}
                         type="text"
@@ -277,21 +283,21 @@ export default function LoginPage() {
 
                   {/* Password */}
                   <div>
-                    <label className="mb-1.5 block text-[11px] text-gray-600 tracking-wider uppercase">
+                    <label className="mb-1.5 block text-[11px] text-muted-foreground tracking-wider uppercase">
                       Password
                     </label>
-                    <div className="flex items-center rounded border border-[#367BF0]/25 bg-[#060810] px-3 py-2.5 transition-all focus-within:border-[#367BF0]/60 focus-within:shadow-[0_0_10px_rgba(54,123,240,0.15)]">
-                      <span className="mr-2 text-[#367BF0] text-sm select-none">›</span>
+                    <div className="flex items-center rounded border border-primary/25 bg-muted/30 px-3 py-2.5 transition-all focus-within:border-primary/60 focus-within:shadow-[0_0_10px_rgba(var(--primary-rgb),0.15)]">
+                      <span className="mr-2 text-primary text-sm select-none">›</span>
                       <input
                         autoComplete={isRegisterMode ? "new-password" : "current-password"}
-                        className="flex-1 bg-transparent text-sm text-[#22c55e] outline-none placeholder:text-gray-700"
+                        className="flex-1 bg-transparent text-sm text-green-500 outline-none placeholder:text-muted-foreground/50"
                         placeholder="••••••••••"
                         type={showPass ? "text" : "password"}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                       />
                       <button
-                        className="ml-2 text-gray-700 transition-colors hover:text-gray-400"
+                        className="ml-2 text-muted-foreground/60 transition-colors hover:text-muted-foreground"
                         tabIndex={-1}
                         type="button"
                         onClick={() => setShowPass((v) => !v)}
@@ -311,14 +317,14 @@ export default function LoginPage() {
                       animate={{ opacity: 1, height: "auto" }}
                       initial={{ opacity: 0, height: 0 }}
                     >
-                      <label className="mb-1.5 block text-[11px] text-gray-600 tracking-wider uppercase">
+                      <label className="mb-1.5 block text-[11px] text-muted-foreground tracking-wider uppercase">
                         Confirm Password
                       </label>
-                      <div className="flex items-center rounded border border-[#367BF0]/25 bg-[#060810] px-3 py-2.5 transition-all focus-within:border-[#367BF0]/60 focus-within:shadow-[0_0_10px_rgba(54,123,240,0.15)]">
-                        <span className="mr-2 text-[#367BF0] text-sm select-none">›</span>
+                      <div className="flex items-center rounded border border-primary/25 bg-muted/30 px-3 py-2.5 transition-all focus-within:border-primary/60 focus-within:shadow-[0_0_10px_rgba(var(--primary-rgb),0.15)]">
+                        <span className="mr-2 text-primary text-sm select-none">›</span>
                         <input
                           autoComplete="new-password"
-                          className="flex-1 bg-transparent text-sm text-[#22c55e] outline-none placeholder:text-gray-700"
+                          className="flex-1 bg-transparent text-sm text-green-500 outline-none placeholder:text-muted-foreground/50"
                           placeholder="••••••••••"
                           type={showPass ? "text" : "password"}
                           value={confirmPassword}
@@ -342,15 +348,15 @@ export default function LoginPage() {
 
                   <div className="flex flex-col gap-3">
                     <button
-                      className="group relative w-full overflow-hidden rounded border border-[#367BF0]/40 bg-[#367BF0]/8 px-4 py-2.5 text-sm text-[#367BF0] transition-all hover:border-[#367BF0]/70 hover:bg-[#367BF0]/15 hover:shadow-[0_0_16px_rgba(54,123,240,0.25)] disabled:cursor-not-allowed disabled:opacity-40"
+                      className="group relative w-full overflow-hidden rounded border border-primary/40 bg-primary/8 px-4 py-2.5 text-sm text-primary transition-all hover:border-primary/70 hover:bg-primary/15 hover:shadow-[0_0_16px_rgba(var(--primary-rgb),0.25)] disabled:cursor-not-allowed disabled:opacity-40"
                       disabled={loading}
                       type="submit"
                     >
                       {loading ? (
                         <span className="flex items-center justify-center gap-2">
-                          <span className="inline-block size-1.5 animate-bounce rounded-full bg-[#367BF0] [animation-delay:0ms]" />
-                          <span className="inline-block size-1.5 animate-bounce rounded-full bg-[#367BF0] [animation-delay:150ms]" />
-                          <span className="inline-block size-1.5 animate-bounce rounded-full bg-[#367BF0] [animation-delay:300ms]" />
+                          <span className="inline-block size-1.5 animate-bounce rounded-full bg-primary [animation-delay:0ms]" />
+                          <span className="inline-block size-1.5 animate-bounce rounded-full bg-primary [animation-delay:150ms]" />
+                          <span className="inline-block size-1.5 animate-bounce rounded-full bg-primary [animation-delay:300ms]" />
                           <span className="ml-2">
                             {isRegisterMode ? "INITIALIZING ACCOUNT" : "AUTHENTICATING"}
                           </span>
@@ -361,7 +367,7 @@ export default function LoginPage() {
                     </button>
 
                     <button
-                      className="text-[10px] text-[#367BF0]/60 transition-colors hover:text-[#367BF0] uppercase tracking-widest"
+                      className="text-[10px] text-primary/60 transition-colors hover:text-primary uppercase tracking-widest"
                       type="button"
                       onClick={() => {
                         setIsRegisterMode(!isRegisterMode);
@@ -375,7 +381,7 @@ export default function LoginPage() {
                   </div>
                 </form>
 
-                <div className="mt-5 border-t border-[#367BF0]/10 pt-4 space-y-2">
+                {/* <div className="mt-5 border-t border-[#367BF0]/10 pt-4 space-y-2">
                   <p className="text-center text-[10px] text-gray-700 tracking-widest uppercase">
                     {isRegisterMode
                       ? "User registration system active"
@@ -398,14 +404,14 @@ export default function LoginPage() {
                       <span className="text-gray-700">kali</span>
                     </span>
                   </div>
-                </div>
+                </div> */}
               </div>
             </motion.div>
           )}
         </AnimatePresence>
 
         {/* Status bar */}
-        <div className="mt-3 flex justify-between text-[10px] text-gray-800">
+        <div className="mt-3 flex justify-between text-[10px] text-muted-foreground/40 font-mono">
           <span>ARTEMIS Terminal v2.0.0</span>
           <span>admin@kali.local</span>
         </div>
