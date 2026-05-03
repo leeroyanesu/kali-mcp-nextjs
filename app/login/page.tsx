@@ -5,6 +5,9 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { MatrixRain } from "@/components/kali/matrix-rain";
 import { ShieldIcon, EyeIcon, EyeOffIcon, AlertCircleIcon } from "lucide-react";
+import { db } from "@/lib/db/dexie";
+import { nanoid } from "nanoid";
+import { hash, compare } from "bcrypt-ts";
 
 /* ── Valid credentials ─────────────────────────────────────────
    Classic Kali Linux defaults. Either pair works.
@@ -44,6 +47,8 @@ export default function LoginPage() {
   const [bootDone, setBootDone] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isRegisterMode, setIsRegisterMode] = useState(false);
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -72,17 +77,70 @@ export default function LoginPage() {
       setError("Error: username and password are required");
       return;
     }
-    setError("");
-    setLoading(true);
-    // Simulate auth handshake delay
-    await new Promise((r) => setTimeout(r, 1200));
-    const expected = VALID_CREDENTIALS[username.trim().toLowerCase()];
-    if (!expected || expected !== password) {
-      setError("Authentication failed: invalid credentials");
-      setLoading(false);
+
+    if (isRegisterMode && password !== confirmPassword) {
+      setError("Error: passwords do not match");
       return;
     }
-    router.push("/dashboard");
+
+    setError("");
+    setLoading(true);
+
+    try {
+      // Simulate auth handshake delay
+      await new Promise((r) => setTimeout(r, 1200));
+
+      if (isRegisterMode) {
+        // Check if user already exists
+        const existingUser = await db.users.where("username").equalsIgnoreCase(username.trim()).first();
+        if (existingUser) {
+          setError("Error: username already exists");
+          setLoading(false);
+          return;
+        }
+
+        const hashedPassword = await hash(password, 10);
+        await db.users.add({
+          id: nanoid(),
+          username: username.trim().toLowerCase(),
+          password: hashedPassword,
+          createdAt: new Date(),
+        });
+
+        // Set session and redirect
+        document.cookie = "kali-auth=true; path=/; max-age=86400; SameSite=Lax";
+        document.cookie = `kali-username=${username.trim().toLowerCase()}; path=/; max-age=86400; SameSite=Lax`;
+        router.push("/dashboard");
+      } else {
+        // Try DB first
+        const user = await db.users.where("username").equalsIgnoreCase(username.trim()).first();
+        let isValid = false;
+
+        if (user) {
+          isValid = await compare(password, user.password);
+        } else {
+          // Fallback to hardcoded defaults
+          const expected = VALID_CREDENTIALS[username.trim().toLowerCase()];
+          if (expected && expected === password) {
+            isValid = true;
+          }
+        }
+
+        if (!isValid) {
+          setError("Authentication failed: invalid credentials");
+          setLoading(false);
+          return;
+        }
+
+        // Set session and redirect
+        document.cookie = "kali-auth=true; path=/; max-age=86400; SameSite=Lax";
+        router.push("/dashboard");
+      }
+    } catch (err) {
+      console.error("Auth error:", err);
+      setError("Critical system error during authentication");
+      setLoading(false);
+    }
   };
 
   return (
@@ -117,7 +175,7 @@ export default function LoginPage() {
             {ASCII_KALI}
           </pre>
           <div className="mt-2 text-[10px] tracking-[0.35em] text-[#367BF0]/60 uppercase">
-            Advanced Reconnaissance & Threat Evasion · Mission Intelligence System
+            Reconnaissance & Exploitation <br /> Cyber Security
           </div>
         </motion.div>
 
@@ -225,7 +283,7 @@ export default function LoginPage() {
                     <div className="flex items-center rounded border border-[#367BF0]/25 bg-[#060810] px-3 py-2.5 transition-all focus-within:border-[#367BF0]/60 focus-within:shadow-[0_0_10px_rgba(54,123,240,0.15)]">
                       <span className="mr-2 text-[#367BF0] text-sm select-none">›</span>
                       <input
-                        autoComplete="current-password"
+                        autoComplete={isRegisterMode ? "new-password" : "current-password"}
                         className="flex-1 bg-transparent text-sm text-[#22c55e] outline-none placeholder:text-gray-700"
                         placeholder="••••••••••"
                         type={showPass ? "text" : "password"}
@@ -247,6 +305,29 @@ export default function LoginPage() {
                     </div>
                   </div>
 
+                  {/* Confirm Password (only for register) */}
+                  {isRegisterMode && (
+                    <motion.div
+                      animate={{ opacity: 1, height: "auto" }}
+                      initial={{ opacity: 0, height: 0 }}
+                    >
+                      <label className="mb-1.5 block text-[11px] text-gray-600 tracking-wider uppercase">
+                        Confirm Password
+                      </label>
+                      <div className="flex items-center rounded border border-[#367BF0]/25 bg-[#060810] px-3 py-2.5 transition-all focus-within:border-[#367BF0]/60 focus-within:shadow-[0_0_10px_rgba(54,123,240,0.15)]">
+                        <span className="mr-2 text-[#367BF0] text-sm select-none">›</span>
+                        <input
+                          autoComplete="new-password"
+                          className="flex-1 bg-transparent text-sm text-[#22c55e] outline-none placeholder:text-gray-700"
+                          placeholder="••••••••••"
+                          type={showPass ? "text" : "password"}
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                        />
+                      </div>
+                    </motion.div>
+                  )}
+
                   {/* Error */}
                   {error && (
                     <motion.div
@@ -259,28 +340,46 @@ export default function LoginPage() {
                     </motion.div>
                   )}
 
-                  {/* Submit */}
-                  <button
-                    className="group relative w-full overflow-hidden rounded border border-[#367BF0]/40 bg-[#367BF0]/8 px-4 py-2.5 text-sm text-[#367BF0] transition-all hover:border-[#367BF0]/70 hover:bg-[#367BF0]/15 hover:shadow-[0_0_16px_rgba(54,123,240,0.25)] disabled:cursor-not-allowed disabled:opacity-40"
-                    disabled={loading}
-                    type="submit"
-                  >
-                    {loading ? (
-                      <span className="flex items-center justify-center gap-2">
-                        <span className="inline-block size-1.5 animate-bounce rounded-full bg-[#367BF0] [animation-delay:0ms]" />
-                        <span className="inline-block size-1.5 animate-bounce rounded-full bg-[#367BF0] [animation-delay:150ms]" />
-                        <span className="inline-block size-1.5 animate-bounce rounded-full bg-[#367BF0] [animation-delay:300ms]" />
-                        <span className="ml-2">AUTHENTICATING</span>
-                      </span>
-                    ) : (
-                      "[ AUTHENTICATE ]"
-                    )}
-                  </button>
+                  <div className="flex flex-col gap-3">
+                    <button
+                      className="group relative w-full overflow-hidden rounded border border-[#367BF0]/40 bg-[#367BF0]/8 px-4 py-2.5 text-sm text-[#367BF0] transition-all hover:border-[#367BF0]/70 hover:bg-[#367BF0]/15 hover:shadow-[0_0_16px_rgba(54,123,240,0.25)] disabled:cursor-not-allowed disabled:opacity-40"
+                      disabled={loading}
+                      type="submit"
+                    >
+                      {loading ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <span className="inline-block size-1.5 animate-bounce rounded-full bg-[#367BF0] [animation-delay:0ms]" />
+                          <span className="inline-block size-1.5 animate-bounce rounded-full bg-[#367BF0] [animation-delay:150ms]" />
+                          <span className="inline-block size-1.5 animate-bounce rounded-full bg-[#367BF0] [animation-delay:300ms]" />
+                          <span className="ml-2">
+                            {isRegisterMode ? "INITIALIZING ACCOUNT" : "AUTHENTICATING"}
+                          </span>
+                        </span>
+                      ) : (
+                        `[ ${isRegisterMode ? "CREATE ACCOUNT" : "AUTHENTICATE"} ]`
+                      )}
+                    </button>
+
+                    <button
+                      className="text-[10px] text-[#367BF0]/60 transition-colors hover:text-[#367BF0] uppercase tracking-widest"
+                      type="button"
+                      onClick={() => {
+                        setIsRegisterMode(!isRegisterMode);
+                        setError("");
+                      }}
+                    >
+                      {isRegisterMode
+                        ? "Already have access? Switch to Login"
+                        : "No access? Create new credentials"}
+                    </button>
+                  </div>
                 </form>
 
                 <div className="mt-5 border-t border-[#367BF0]/10 pt-4 space-y-2">
                   <p className="text-center text-[10px] text-gray-700 tracking-widest uppercase">
-                    Unauthorized access is strictly prohibited
+                    {isRegisterMode
+                      ? "User registration system active"
+                      : "Unauthorized access is strictly prohibited"}
                   </p>
                   <div className="flex justify-center gap-6 text-[10px] text-gray-800 font-mono">
                     <span>

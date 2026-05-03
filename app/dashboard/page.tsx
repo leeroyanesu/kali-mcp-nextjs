@@ -188,13 +188,17 @@ export default function DashboardPage() {
               <span className="text-[#22c55e]">ONLINE</span>
             </div>
             <span className="tabular-nums text-[#367BF0]/60">{time}</span>
-            <Link
+            <button
               className="flex items-center gap-1.5 text-gray-600 transition-colors hover:text-gray-300"
-              href="/login"
+              onClick={() => {
+                document.cookie = "kali-auth=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+                document.cookie = "kali-username=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+                window.location.href = "/login";
+              }}
             >
               <LogOutIcon className="size-3.5" />
               <span className="hidden sm:inline">Logout</span>
-            </Link>
+            </button>
           </div>
         </div>
       </header>

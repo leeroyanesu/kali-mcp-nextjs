@@ -67,6 +67,7 @@
         "swr": "^2.2.5",
         "tailwind-merge": "^2.5.2",
         "tailwindcss-animate": "^1.0.7",
+        "undici": "^8.2.0",
         "use-stick-to-bottom": "^1.1.1",
         "usehooks-ts": "^3.1.0",
         "zod": "^3.25.76",
@@ -1618,6 +1619,8 @@
     "ufo": ["ufo@1.6.3", "", {}, "sha512-yDJTmhydvl5lJzBmy/hyOAA0d+aqCBuwl818haVdYCRrWV84o7YyeVm4QlVHStqNrrJSTb6jKuFAVqAFsr+K3Q=="],
 
     "ultracite": ["ultracite@7.0.11", "", { "dependencies": { "@clack/prompts": "0.11.0", "@trpc/server": "11.8.1", "deepmerge": "4.3.1", "glob": "13.0.0", "jsonc-parser": "3.3.1", "nypm": "0.6.2", "trpc-cli": "0.12.2", "zod": "4.3.5" }, "bin": { "ultracite": "dist/index.js" } }, "sha512-YeuJTf/Tu12l7K0qvl1G525NfrPUay6UFVt6TrTL8QfXcFZBI+Tzr0Dg14Hxcb964pRQF5PjBaUk3bJCNQHu+g=="],
+
+    "undici": ["undici@8.2.0", "", {}, "sha512-Z+4Hx9GE26Lh9Upwfnc8C7SsrpBPGaM/Gm6kMFtiG7c+5IvQKlXi/t+9x9DrrCh29cww5TSP9YdVaBcnLDs5fQ=="],
 
     "undici-types": ["undici-types@6.20.0", "", {}, "sha512-Ny6QZ2Nju20vw1SRHe3d9jVu6gJ+4e3+MMpqu7pqE5HT6WsTSlce++GQmK5UXS8mzV8DSYHrQH+Xrf2jVcuKNg=="],
 

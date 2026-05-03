@@ -34,10 +34,17 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 async function SidebarShell({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies();
   const isCollapsed = cookieStore.get("sidebar_state")?.value !== "true";
+  const username = cookieStore.get("kali-username")?.value ?? "Kali Admin";
+
+  const user = {
+    ...LOCAL_USER,
+    name: username,
+    email: `${username}@kali.local`,
+  };
 
   return (
     <SidebarProvider defaultOpen={!isCollapsed}>
-      <AppSidebar user={LOCAL_USER} />
+      <AppSidebar user={user} />
       <SidebarInset>
         <Toaster
           position="top-center"

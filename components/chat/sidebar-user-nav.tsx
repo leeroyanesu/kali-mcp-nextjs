@@ -53,10 +53,20 @@ export function SidebarUserNav({
             >
               {`Toggle ${resolvedTheme === "light" ? "dark" : "light"} mode`}
             </DropdownMenuItem>
+            <DropdownMenuItem
+              className="cursor-pointer text-[13px] text-red-400 focus:text-red-400"
+              onSelect={() => {
+                document.cookie = "kali-auth=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+                document.cookie = "kali-username=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+                window.location.href = "/login";
+              }}
+            >
+              Sign out
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-[13px] text-muted-foreground cursor-default">
+            <DropdownMenuItem className="text-[13px] text-[#22c55e] cursor-default">
               <ShieldIcon className="size-3 mr-1" />
-              Local admin — no auth required
+              Authenticated session
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
