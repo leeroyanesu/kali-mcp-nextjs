@@ -11,7 +11,7 @@ import {
   UndoIcon,
   PDFIcon,
 } from "@/components/chat/icons";
-import { exportToPDF } from "@/lib/pdf-utils";
+import { exportToDOCX } from "@/lib/docx-utils";
 import { Editor } from "@/components/chat/text-editor";
 import type { Suggestion } from "@/lib/db/schema";
 import { getSuggestions } from "../actions";
@@ -106,14 +106,14 @@ export const textArtifact = new Artifact<"text", TextArtifactMetadata>({
   actions: [
     {
       icon: <PDFIcon size={18} />,
-      description: "Export as PDF",
+      description: "Export as DOCX",
       onClick: async ({ content, metadata, currentVersionIndex }) => {
         try {
           const title = (metadata as any)?.title || `Report_v${currentVersionIndex + 1}`;
-          await exportToPDF(content, title);
-          toast.success("PDF exported successfully!");
+          await exportToDOCX(content, title);
+          toast.success("DOCX exported successfully!");
         } catch (error) {
-          toast.error("Failed to export PDF");
+          toast.error("Failed to export DOCX");
         }
       },
     },

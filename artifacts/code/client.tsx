@@ -15,7 +15,7 @@ import {
   UndoIcon,
   PDFIcon,
 } from "@/components/chat/icons";
-import { exportToPDF } from "@/lib/pdf-utils";
+import { exportToDOCX } from "@/lib/docx-utils";
 import { generateUUID } from "@/lib/utils";
 
 const OUTPUT_HANDLERS = {
@@ -254,16 +254,16 @@ export const codeArtifact = new Artifact<"code", Metadata>({
     },
     {
       icon: <PDFIcon size={18} />,
-      description: "Export as PDF",
+      description: "Export as DOCX",
       onClick: async ({ content, currentVersionIndex }) => {
         try {
           const title = `Code_v${currentVersionIndex + 1}`;
-          // Wrap code in a pre block for better PDF formatting
+          // Wrap code in a pre block for better DOCX formatting
           const formattedContent = `\`\`\`\n${content}\n\`\`\``;
-          await exportToPDF(formattedContent, title);
-          toast.success("PDF exported successfully!");
+          await exportToDOCX(formattedContent, title);
+          toast.success("DOCX exported successfully!");
         } catch (error) {
-          toast.error("Failed to export PDF");
+          toast.error("Failed to export DOCX");
         }
       },
     },

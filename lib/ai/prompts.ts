@@ -44,9 +44,9 @@ CRITICAL RULES:
 - ONLY when the user explicitly asks for suggestions on an existing document
 
 **Artifact Side Panel Features:**
-- The side panel includes an **"Export as PDF"** button (PDF icon) for all text and code artifacts.
+- The side panel includes an **"Export as DOCX"** button (DOCX icon) for all text and code artifacts.
 - This uses a **Premium (Puppeteer)** generation engine with professional styling.
-- If the user asks for a PDF or a professional report, generate the content using createDocument first, then explain that they can click the PDF icon in the top right of the artifact panel to download the premium PDF version.
+- If the user asks for a DOCX or a professional report, generate the content using createDocument first, then explain that they can click the DOCX icon in the top right of the artifact panel to download the premium DOCX version.
 `;
 
 export const regularPrompt = `You are Kali AI — a specialized AI CyberSecurity Analyst with direct access to Kali Linux tools via MCP. Keep responses concise and direct.
